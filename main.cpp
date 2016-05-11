@@ -5,6 +5,8 @@
 
 using namespace std;
 
+const int TABLE_ROWS = 8;
+
 struct main_table {
     unsigned int id;
     char * title;
@@ -60,8 +62,7 @@ void DataTable::add_line(int id, char * title, char * place, int year) {
     если больше то производим перегруппировку таблицы
      */
     int len = this->table_length;
-    if (len < 9) {
-        
+    if (len < (TABLE_ROWS+1)) {
         gotoxy(2, 3+(len*2));
         cout << id << endl;
         
@@ -77,10 +78,44 @@ void DataTable::add_line(int id, char * title, char * place, int year) {
         gotoxy(0, 4+(len*2));
         cout << "+----+-----------------------------+----------------------------+-------------+" << endl;    
         
-        this->table_length++;
+        /* косвеенное вычисление координаты следующей строки */
+        this->table_length++; 
         
     } else {
-        
+        int int_id, i, j;
+        char * int_title;
+        char * int_place;
+        int int_year; 
+        for(i=len, j=1; j<=TABLE_ROWS ; --i, j++ ) {
+            /* i осуществяет перебор id */
+            /* j осуществяет перебор строк */
+            if (j == TABLE_ROWS) {
+               int_id    = id;
+               int_title = title;
+               int_place = place;
+               int_year  = year;          
+            } else {
+               int_id    = this->data[i-TABLE_ROWS].id;
+               int_title = this->data[i-TABLE_ROWS].title;
+               int_place = this->data[i-TABLE_ROWS].place;
+               int_year  = this->data[i-TABLE_ROWS].year;              
+            }    
+            gotoxy(2, 3+((j-1)*2));
+            cout << int_id << endl;
+            
+            gotoxy(6, 3+((j-1)*2));
+            cout << int_title << endl;
+            
+            gotoxy(36, 3+((j-1)*2));
+            cout << int_place << endl;
+            
+            gotoxy(65, 3+((j-1)*2));
+            cout << int_year << endl;
+            
+            gotoxy(0, 4+((j-1)*2));
+            cout << "+----+-----------------------------+----------------------------+-------------+" << endl; 
+            cout << "Debug " << j - 1 << endl;               
+        }
     }
     this->data[len].id    = len;
     this->data[len].title = title;
@@ -101,6 +136,7 @@ int main(int argc, char *argv[])
     t1.add_line(6, "dsdsd", "sdsd13", 1999);
     t1.add_line(7, "dsdsd", "sdsd13", 1999);
     t1.add_line(8, "dsdsd", "sdsd13", 1999);
+    t1.add_line(9, "aaaaaaa", "aaaaaaaa", 2000);
     gotoxy(0, 24);
     cout << "Введите команду -> ";c = getchar();
     return 0;

@@ -27,6 +27,7 @@ class DataTable {
     public:
         DataTable();
         void show();
+        void clear_table();
         void add_line(int id, char * title, char * place, int year);
 };
 
@@ -56,6 +57,14 @@ void DataTable::show() {
     cout << "+----+-----------------------------+----------------------------+-------------+" << endl;
 };   
 
+void DataTable::clear_table() {
+     for(int y=0; y < 19; ++y) {
+        for(int x=0; x < 80; ++x) {
+            gotoxy(x, y);
+            cout << " " << endl;
+        }    
+     }
+}
 
 void DataTable::add_line(int id, char * title, char * place, int year) {
     /* Максимальное количество отображаемых строк 8 
@@ -78,10 +87,9 @@ void DataTable::add_line(int id, char * title, char * place, int year) {
         gotoxy(0, 4+(len*2));
         cout << "+----+-----------------------------+----------------------------+-------------+" << endl;    
         
-        /* косвеенное вычисление координаты следующей строки */
-        this->table_length++; 
-        
     } else {
+        /* system("cls"); очищаем экран */
+        this->clear_table();
         int int_id, i, j;
         char * int_title;
         char * int_place;
@@ -117,6 +125,8 @@ void DataTable::add_line(int id, char * title, char * place, int year) {
             cout << "Debug " << j - 1 << endl;               
         }
     }
+    /* косвеенное вычисление координаты следующей строки */
+    this->table_length++; 
     this->data[len].id    = len;
     this->data[len].title = title;
     this->data[len].place = place;
@@ -128,7 +138,8 @@ int main(int argc, char *argv[])
     char c;
     DataTable t1;
     t1.show();
-    t1.add_line(1, "dfdf", "23213", 1998);
+    t1.clear_table();
+ /*   t1.add_line(1, "dfdf", "23213", 1998);
     t1.add_line(2, "dsdsd", "sdsd13", 1999);
     t1.add_line(3, "dsdsd", "sdsd13", 1999);
     t1.add_line(4, "dsdsd", "sdsd13", 1999);
@@ -136,7 +147,7 @@ int main(int argc, char *argv[])
     t1.add_line(6, "dsdsd", "sdsd13", 1999);
     t1.add_line(7, "dsdsd", "sdsd13", 1999);
     t1.add_line(8, "dsdsd", "sdsd13", 1999);
-    t1.add_line(9, "aaaaaaa", "aaaaaaaa", 2000);
+    t1.add_line(9, "aaaaaaa", "aaaaaaaa", 2000);*/
     gotoxy(0, 24);
     cout << "Введите команду -> ";c = getchar();
     return 0;

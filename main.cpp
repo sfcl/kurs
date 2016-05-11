@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <stdio.h>
+#include <conio.h>
 #include <windows.h>
 
 using namespace std;
@@ -11,7 +12,7 @@ struct main_table {
     unsigned int id;
     char * title;
     char * place;
-    char year;
+    int year;
 };
 
 void gotoxy(int x, int y) {
@@ -20,24 +21,36 @@ void gotoxy(int x, int y) {
      SetConsoleCursorPosition(hStdout, position);
 }
 
+void clear_all() {
+    for(int y=0; y < 30; ++y) {
+        for(int x=0; x < 80; ++x) {
+            gotoxy(x, y);
+            cout << " " << endl;
+        }    
+    }
+}
+
 class DataTable {
     private:
         main_table data[100];
         int table_length;
+        unsigned int id; 
     public:
         DataTable();
         void show();
         void clear_table();
-        void add_line(int id, char * title, char * place, int year);
+        void add_line(char * title, char * place, int year);
 };
 
 DataTable::DataTable() {
      this->table_length = 0;
+     this->id = 1;
 }
 
 void DataTable::show() {
+    gotoxy(0, 0);
     cout << "+----+-----------------------------+----------------------------+-------------+" << endl;
-    cout << "| ID |    Íàçâàíèå                 |  Ìåñòîïîëîæåíèå            | Ãîä ñîçäàíèÿ|" << endl;              
+    cout << "| ID |     §¢ ­¨¥                 |  Œ¥áâ®¯®«®¦¥­¨¥            | ƒ®¤ á®§¤ ­¨ï|" << endl;              
     cout << "+----+-----------------------------+----------------------------+-------------+" << endl;                  
     cout << "|    |                             |                            |             |" << endl;
     cout << "|    |                             |                            |             |" << endl;
@@ -66,89 +79,142 @@ void DataTable::clear_table() {
      }
 }
 
-void DataTable::add_line(int id, char * title, char * place, int year) {
-    /* Ìàêñèìàëüíîå êîëè÷åñòâî îòîáðàæàåìûõ ñòðîê 8 
-    åñëè áîëüøå òî ïðîèçâîäèì ïåðåãðóïïèðîâêó òàáëèöû
+void DataTable::add_line(char * title, char * place, int year) {
+    /* Œ ªá¨¬ «ì­®¥ ª®«¨ç¥áâ¢® ®â®¡à ¦ ¥¬ëå áâà®ª 8 
+    ¥á«¨ ¡®«ìè¥ â® ¯à®¨§¢®¤¨¬ ¯¥à¥£àã¯¯¨à®¢ªã â ¡«¨æë
      */
+    this->table_length++;
     int len = this->table_length;
-    if (len < (TABLE_ROWS+1)) {
-        gotoxy(2, 3+(len*2));
-        cout << id << endl;
-        
-        gotoxy(6, 3+(len*2));
-        cout << title << endl;
-        
-        gotoxy(36, 3+(len*2));
-        cout << place << endl;
-        
-        gotoxy(65, 3+(len*2));
-        cout << year << endl;
-        
-        gotoxy(0, 4+(len*2));
-        cout << "+----+-----------------------------+----------------------------+-------------+" << endl;    
-        
-    } else {
-        /* system("cls"); î÷èùàåì ýêðàí */
-        this->clear_table();
-        int int_id, i, j;
-        char * int_title;
-        char * int_place;
-        int int_year; 
-        for(i=len, j=1; j<=TABLE_ROWS ; --i, j++ ) {
-            /* i îñóùåñòâÿåò ïåðåáîð id */
-            /* j îñóùåñòâÿåò ïåðåáîð ñòðîê */
-            if (j == TABLE_ROWS) {
-               int_id    = id;
-               int_title = title;
-               int_place = place;
-               int_year  = year;          
-            } else {
-               int_id    = this->data[i-TABLE_ROWS].id;
-               int_title = this->data[i-TABLE_ROWS].title;
-               int_place = this->data[i-TABLE_ROWS].place;
-               int_year  = this->data[i-TABLE_ROWS].year;              
-            }    
-            gotoxy(2, 3+((j-1)*2));
-            cout << int_id << endl;
-            
-            gotoxy(6, 3+((j-1)*2));
-            cout << int_title << endl;
-            
-            gotoxy(36, 3+((j-1)*2));
-            cout << int_place << endl;
-            
-            gotoxy(65, 3+((j-1)*2));
-            cout << int_year << endl;
-            
-            gotoxy(0, 4+((j-1)*2));
-            cout << "+----+-----------------------------+----------------------------+-------------+" << endl; 
-            cout << "Debug " << j - 1 << endl;               
-        }
-    }
-    /* êîñâååííîå âû÷èñëåíèå êîîðäèíàòû ñëåäóþùåé ñòðîêè */
-    this->table_length++; 
-    this->data[len].id    = len;
+    /* ª®á¢¥¥­­®¥ ¢ëç¨á«¥­¨¥ ª®®à¤¨­ âë á«¥¤ãîé¥© áâà®ª¨ */
+    this->data[len].id    = this->id;
     this->data[len].title = title;
     this->data[len].place = place;
     this->data[len].year  = year;
+    this->id++;
+    if (len < (TABLE_ROWS+1)) {
+        gotoxy(2, 3+((len-1)*2));
+        cout << id << endl;
+        
+        gotoxy(6, 3+((len-1)*2));
+        cout << title << endl;
+        
+        gotoxy(36, 3+((len-1)*2));
+        cout << place << endl;
+        
+        gotoxy(65, 3+((len-1)*2));
+        cout << year << endl;
+        
+        gotoxy(0, 4+((len-1)*2));
+        cout << "+----+-----------------------------+----------------------------+-------------+" << endl;    
+    } 
+    /*else { */
+        /* ®ç¨é ¥¬ íªà ­ */
+    /*    this->clear_table();
+        this->show();
+        int i, j;
+
+        for(i=(len - TABLE_ROWS + 1), j=0; j<TABLE_ROWS ; i++, j++ ) {
+            /* i ®áãé¥áâ¢ï¥â ¯¥à¥¡®à id */
+            /* j ®áãé¥áâ¢ï¥â ¯¥à¥¡®à áâà®ª */         
+      /*     gotoxy(2, 3+(j*2));
+           cout << this->data[i].id << endl;
+            
+           gotoxy(6, 3+(j*2));
+           cout << this->data[i].title << endl;
+            
+           gotoxy(36, 3+(j*2));
+           cout << this->data[i].place << endl;
+            
+           gotoxy(65, 3+(j*2));
+           cout << this->data[i].year << endl;
+            
+           gotoxy(0, 4+(j*2));
+           cout << "+----+-----------------------------+----------------------------+-------------+" << endl; 
+                       
+        }
+    }  */
+    
 };
+
+
+class Dialog {
+    private:
+        char * title;
+        char * place;
+        int year;
+        DataTable * tab;
+        
+    public:
+        void show();
+        Dialog(DataTable * tab);
+
+};
+
+void Dialog::show() {
+    clear_all();
+    char ch;
+    cout << "Title = ";    cin >> this->title;
+    cout << "Place = ";    cin >> this->place;
+    cout << "Year =  ";    cin >> this->year;
+    cout << "Save? [y/n]"; ch = getch();
+    if (ch == 'y') {
+        /* Save data in table */ 
+        tab->add_line(this->title, this->place, this->year);     
+    } else {
+        /*  Exit from dialog without saved  */       
+    } 
+}
+
+Dialog::Dialog(DataTable * tab) {
+    this->tab = tab; 
+}
+
 
 int main(int argc, char *argv[])
 {
     char c;
     DataTable t1;
     t1.show();
-    t1.clear_table();
- /*   t1.add_line(1, "dfdf", "23213", 1998);
-    t1.add_line(2, "dsdsd", "sdsd13", 1999);
-    t1.add_line(3, "dsdsd", "sdsd13", 1999);
-    t1.add_line(4, "dsdsd", "sdsd13", 1999);
-    t1.add_line(5, "dsdsd", "sdsd13", 1999);
-    t1.add_line(6, "dsdsd", "sdsd13", 1999);
-    t1.add_line(7, "dsdsd", "sdsd13", 1999);
-    t1.add_line(8, "dsdsd", "sdsd13", 1999);
-    t1.add_line(9, "aaaaaaa", "aaaaaaaa", 2000);*/
+    t1.add_line("dfdf", "23213", 1998);
+    t1.add_line("dsdsd", "sdsd13", 1999);
+    t1.add_line("dsdsd", "sdsd13", 1999);
+    t1.add_line("dsdsd", "sdsd13", 1999);
+    t1.add_line("dsdsd", "sdsd13", 1999);
+    t1.add_line("dsdsd", "sdsd13", 1999);
+    t1.add_line("dsdsd", "sdsd13", 1999);
+    t1.add_line("dsdsd", "sdsd13", 1999);
+    t1.add_line("aaaaaaa", "aaaaaaaa", 2000);
+    t1.add_line("bbbbbbb", "vvvvvvvv", 2001);
+    t1.add_line("ccccccc", "wwwwwwww", 2001);
     gotoxy(0, 24);
-    cout << "Ââåäèòå êîìàíäó -> ";c = getchar();
+    cout << "‚¢¥¤¨â¥ ª®¬ ­¤ã -> ";
+    int up = 0;
+    unsigned int ch;
+    while(1) {
+      if(kbhit()) {
+           ch = getch();
+           if ((ch == 'e') || (ch == 'E')) {
+              break;
+           }
+           
+           if (ch ==  113 ) { // up key
+              gotoxy(40, 24); cout << ++up;  
+           }
+           if (ch ==  97) { // down key
+              gotoxy(40, 24);
+              if (up == 0) { 
+                  cout << up;
+              } else {
+                  cout << --up;
+              }
+           }
+           if (ch ==  110) { // ÿcreate new object by n key
+              
+           }
+           gotoxy(30, 24);  cout << (int) ch;
+           while(kbhit()) getch();  //clear the buffer again although it is not necessary, remove this to make the game smoother
+       }
+       //add a wait here if you want
+    }
     return 0;
 }

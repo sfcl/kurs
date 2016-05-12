@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <stdio.h>
+#include <string>
 #include <conio.h>
 #include <windows.h>
 
@@ -10,8 +11,8 @@ const int TABLE_ROWS = 8;
 
 struct main_table {
     unsigned int id;
-    char * title;
-    char * place;
+    string title;
+    string place;
     int year;
 };
 
@@ -41,7 +42,7 @@ class DataTable {
         DataTable();
         void show();
         void clear_table();
-        void add_line(char * title, char * place, int year);
+        void add_line(string title, string place, int year);
         void data_up();
         void data_down();
 };
@@ -127,7 +128,7 @@ void DataTable::clear_table() {
      }
 }
 
-void DataTable::add_line(char * title, char * place, int year) {
+void DataTable::add_line(string title, string place, int year) {
     /* Максимальное количество отображаемых строк 8 
     если больше то производим перегруппировку таблицы
      */
@@ -185,13 +186,13 @@ class Dialog {
 void Dialog::show() {
     clear_all();
     char ch;
-    char title1[64];
-    char place1[64];
+    string title1 = "";
+    string place1 = "";
     int year1;
     cout << "Add new cultural item" << endl << endl;
-    cout << "Title = ";    cin >> title1;
-    cout << "Place = ";    cin >> place1;
-    cout << "Year =  ";    cin >> year1;
+    cout << "Title = "; getline(cin, title1);
+    cout << "Place = "; getline(cin, place1);
+    cout << "Year =  "; cin >> year1;
     cout << "Save? [y/n] "; ch = getch();
     if (ch == 'y') {
         /* Save data in table */ 

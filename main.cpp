@@ -43,6 +43,7 @@ class DataTable {
         bool change;
         DataTable();
         void show();
+        void save();
         void clear_table();
         void add_line(string title, string place, int year);
         void data_up();
@@ -65,8 +66,7 @@ DataTable::DataTable() {
             if( !f.read((char *) &row, sizeof(row)) )
                 break; 
             f.read((char *) &row, sizeof(row));
-            cout << row.title <<  row.place << row.year << endl; getch();
-            /*this->add_line(row.title, row.place, row.year); */
+            this->add_line(row.title, row.place, row.year);
         }
         
      } else { 
@@ -161,9 +161,23 @@ void DataTable::clear_table() {
      }
 }
 
+void DataTable::save() {
+     int len = this->table_length;
+     main_table row;
+     ofstream f;
+     f.open("data.db", ios::binary|ios::out);
+     for(int i=1; i<(len+1); i++) {
+        row.id = i;
+        row.title = this->data[i].title;
+        row.place = this->data[i].place;
+        row.year  = this->data[i].year;     
+        f.write((char *) &row, sizeof(row));
+     }
+     f.close();     
+}
+
 void DataTable::add_line(string title, string place, int year) {
     this->table_length++;
-    this->change = true;
     int len = this->table_length;
     this->data[len].id    = this->id;
     this->data[len].title = title;
@@ -200,12 +214,13 @@ void Dialog::show() {
     cout << "мето          "; getline(cin, place1);
     cout << "Год создания  "; cin >> year1;
     cout << "Сохранить? [y/n] "; ch = getch();
-    if (ch == 'y') {
-        /* Save data in table */ 
+    if ((ch == 'y') || (ch == 'Y')) {
+        /* Сохраняем данные в таблицу */ 
         this->tab->add_line(title1, place1, year1);
-        this->tab->show();     
+        this->tab->show();
+        this->tab->change = true;     
     } else {
-        /*  Exit from dialog without saved  */
+        /*  Выходим из диалога без сохранения  */
         this->tab->show();       
     } 
 }
@@ -226,13 +241,14 @@ void Dialog::show_help() {
 void Dialog::save() {
      clear_all();
      char ch;
-     cout << "You change table data saved it ? [y/n] "; cin >> ch;
+     cout << "Данные были изменены, хотите их сохранить? [y/n] "; cin >> ch;
      if ((ch== 'Y') || (ch == 'y')) {
-         cout << "Save data in file" << endl;
+         this->tab->save();
+         cout << "Данные сохранены в файле." << endl;         
      }
      
      if ((ch== 'n') || (ch == 'N')) {
-         cout << "Exit without saved." << endl;      
+         cout << "Выход без сохранения." << endl;      
      }
      getch();
 }

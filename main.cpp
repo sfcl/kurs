@@ -39,6 +39,7 @@ class DataTable {
         unsigned int id;
         unsigned int first_index; 
     public:
+        bool change;
         DataTable();
         void show();
         void clear_table();
@@ -51,6 +52,7 @@ DataTable::DataTable() {
      this->table_length = 0;
      this->id = 1;
      this->first_index = 1;
+     this->change = false;
 }
 
 void DataTable::show() {
@@ -133,40 +135,14 @@ void DataTable::add_line(string title, string place, int year) {
     если больше то производим перегруппировку таблицы
      */
     this->table_length++;
+    this->change = true;
     int len = this->table_length;
     /* косвеенное вычисление координаты следующей строки */
     this->data[len].id    = this->id;
     this->data[len].title = title;
     this->data[len].place = place;
     this->data[len].year  = year;
-    this->id++; 
-    /*else { */
-        /* очищаем экран */
-    /*    this->clear_table();
-        this->show();
-        int i, j;
-
-        for(i=(len - TABLE_ROWS + 1), j=0; j<TABLE_ROWS ; i++, j++ ) {
-            /* i осуществяет перебор id */
-            /* j осуществяет перебор строк */         
-      /*     gotoxy(2, 3+(j*2));
-           cout << this->data[i].id << endl;
-            
-           gotoxy(6, 3+(j*2));
-           cout << this->data[i].title << endl;
-            
-           gotoxy(36, 3+(j*2));
-           cout << this->data[i].place << endl;
-            
-           gotoxy(65, 3+(j*2));
-           cout << this->data[i].year << endl;
-            
-           gotoxy(0, 4+(j*2));
-           cout << "+----+-----------------------------+----------------------------+-------------+" << endl; 
-                       
-        }
-    }  */
-    
+    this->id++;     
 };
 
 
@@ -178,9 +154,9 @@ class Dialog {
         DataTable * tab;
         
     public:
-        void show();
         Dialog(DataTable * tab);
-
+        void show();
+        void save();
 };
 
 void Dialog::show() {
@@ -190,6 +166,7 @@ void Dialog::show() {
     string place1 = "";
     int year1;
     cout << "Add new cultural item" << endl << endl;
+    cin.clear();
     cout << "Title = "; getline(cin, title1);
     cout << "Place = "; getline(cin, place1);
     cout << "Year =  "; cin >> year1;
@@ -202,6 +179,20 @@ void Dialog::show() {
         /*  Exit from dialog without saved  */
         this->tab->show();       
     } 
+}
+
+void Dialog::save() {
+     clear_all();
+     char ch;
+     cout << "You change table data saved it ? [y/n] "; cin >> ch;
+     if ((ch== 'Y') || (ch == 'y')) {
+         cout << "Save data in file" << endl;
+     }
+     
+     if ((ch== 'n') || (ch == 'N')) {
+         cout << "Exit without saved." << endl;      
+     }
+     getch();
 }
 
 Dialog::Dialog(DataTable * tab) {
@@ -231,6 +222,10 @@ int main(int argc, char *argv[])
       if(kbhit()) {
            ch = getch();
            if ((ch == 'e') || (ch == 'E')) {
+              if (t1.change) {
+                 Dialog dialog(& t1);
+                 dialog.save();
+              }
               break;
            }
            

@@ -28,23 +28,28 @@ void clear_all() {
             cout << " " << endl;
         }    
     }
+    gotoxy(0,0);
 }
 
 class DataTable {
     private:
         main_table data[100];
         int table_length;
-        unsigned int id; 
+        unsigned int id;
+        unsigned int first_index; 
     public:
         DataTable();
         void show();
         void clear_table();
         void add_line(char * title, char * place, int year);
+        void data_up();
+        void data_down();
 };
 
 DataTable::DataTable() {
      this->table_length = 0;
      this->id = 1;
+     this->first_index = 1;
 }
 
 void DataTable::show() {
@@ -68,7 +73,50 @@ void DataTable::show() {
     cout << "|    |                             |                            |             |" << endl;
     cout << "|    |                             |                            |             |" << endl;
     cout << "+----+-----------------------------+----------------------------+-------------+" << endl;
+    int len = this->table_length;
+    int id = this->first_index;
+    for (int i=1; i <(TABLE_ROWS+1); i++, id++) {
+        gotoxy(2, 3+((i-1)*2));
+        cout << this->data[id].id << endl;
+        
+        gotoxy(6, 3+((i-1)*2));
+        cout << this->data[id].title << endl;
+        
+        gotoxy(36, 3+((i-1)*2));
+        cout << this->data[id].place << endl;
+        
+        gotoxy(65, 3+((i-1)*2));
+        cout << this->data[id].year << endl;
+        
+        gotoxy(0, 4+((i-1)*2));
+        cout << "+----+-----------------------------+----------------------------+-------------+" << endl;    
+        }
+        gotoxy(0, 24);
+        cout << "Введите команду -> ";
 };   
+
+void DataTable::data_down() {
+     unsigned int id;
+     unsigned int first_index = this->first_index;
+     first_index++;
+     if ( (first_index + TABLE_ROWS - 1) <= this->table_length) {
+     } else {
+         first_index--;   
+     }
+     this->first_index = first_index;
+     this->show();      
+}
+
+void DataTable::data_up() {
+     unsigned int first_index = this->first_index;
+     first_index--;
+     if ( first_index == 0) {
+        first_index = 1;
+     }
+     this->first_index = first_index;
+     this->show();      
+}
+
 
 void DataTable::clear_table() {
      for(int y=0; y < 19; ++y) {
@@ -90,23 +138,7 @@ void DataTable::add_line(char * title, char * place, int year) {
     this->data[len].title = title;
     this->data[len].place = place;
     this->data[len].year  = year;
-    this->id++;
-    if (len < (TABLE_ROWS+1)) {
-        gotoxy(2, 3+((len-1)*2));
-        cout << id << endl;
-        
-        gotoxy(6, 3+((len-1)*2));
-        cout << title << endl;
-        
-        gotoxy(36, 3+((len-1)*2));
-        cout << place << endl;
-        
-        gotoxy(65, 3+((len-1)*2));
-        cout << year << endl;
-        
-        gotoxy(0, 4+((len-1)*2));
-        cout << "+----+-----------------------------+----------------------------+-------------+" << endl;    
-    } 
+    this->id++; 
     /*else { */
         /* очищаем экран */
     /*    this->clear_table();
@@ -153,15 +185,21 @@ class Dialog {
 void Dialog::show() {
     clear_all();
     char ch;
-    cout << "Title = ";    cin >> this->title;
-    cout << "Place = ";    cin >> this->place;
-    cout << "Year =  ";    cin >> this->year;
-    cout << "Save? [y/n]"; ch = getch();
+    char title1[64];
+    char place1[64];
+    int year1;
+    cout << "Add new cultural item" << endl << endl;
+    cout << "Title = ";    cin >> title1;
+    cout << "Place = ";    cin >> place1;
+    cout << "Year =  ";    cin >> year1;
+    cout << "Save? [y/n] "; ch = getch();
     if (ch == 'y') {
         /* Save data in table */ 
-        tab->add_line(this->title, this->place, this->year);     
+        this->tab->add_line(title1, place1, year1);
+        this->tab->show();     
     } else {
-        /*  Exit from dialog without saved  */       
+        /*  Exit from dialog without saved  */
+        this->tab->show();       
     } 
 }
 
@@ -174,7 +212,6 @@ int main(int argc, char *argv[])
 {
     char c;
     DataTable t1;
-    t1.show();
     t1.add_line("dfdf", "23213", 1998);
     t1.add_line("dsdsd", "sdsd13", 1999);
     t1.add_line("dsdsd", "sdsd13", 1999);
@@ -186,8 +223,7 @@ int main(int argc, char *argv[])
     t1.add_line("aaaaaaa", "aaaaaaaa", 2000);
     t1.add_line("bbbbbbb", "vvvvvvvv", 2001);
     t1.add_line("ccccccc", "wwwwwwww", 2001);
-    gotoxy(0, 24);
-    cout << "Введите команду -> ";
+    t1.show();
     int up = 0;
     unsigned int ch;
     while(1) {
@@ -209,7 +245,16 @@ int main(int argc, char *argv[])
               }
            }
            if (ch ==  110) { //  create new object by n key
-              
+               Dialog dialog(& t1);
+               dialog.show();
+           }
+           
+           if (ch == 113) { // scroll table up
+               t1.data_up();   
+           }
+           
+           if (ch == 97) { // scroll table donwn
+              t1.data_down();              
            }
            gotoxy(30, 24);  cout << (int) ch;
            while(kbhit()) getch();  //clear the buffer again although it is not necessary, remove this to make the game smoother

@@ -23,6 +23,11 @@ void gotoxy(int x, int y) {
      SetConsoleCursorPosition(hStdout, position);
 }
 
+bool is_empty(std::ifstream& pFile) {
+     /* функция проверяльщик пустоты файла */
+    return pFile.peek() == std::ifstream::traits_type::eof();
+}
+
 void clear_all() {
     for(int y=0; y < 30; ++y) {
         for(int x=0; x < 80; ++x) {
@@ -58,25 +63,30 @@ DataTable::DataTable() {
      this->id = 1;
      this->first_index = 1;
      this->change = false;
-     main_table row;
-     ifstream f;
-     f.open("data.db", ios::binary);
-     if (f) {
-        while (f.good()) {
-            if( !f.read((char *) &row, sizeof(row)) )
-                break; 
-            f.read((char *) &row, sizeof(row));
-            this->add_line(row.title, row.place, row.year);
+     ifstream data_file("data.db", ios::binary);
+     ifstream index_file("index.db", ios::binary);
+     unsigned int t_size; 
+     if (data_file && index_file) {
+        index_file.read((char*)&t_size, sizeof(t_size));
+        main_table main_table[t_size];
+        data_file.read((char*)&main_table, sizeof(main_table));
+        for (int idx = 0; idx < t_size; idx++) {
+            this->add_line(main_table[idx].title, 
+                           main_table[idx].place, 
+                           main_table[idx].year);
         }
         
      } else { 
          /* если файл базы данных отсутствует, то создаём пустой */
-         cout << "Не найден файл данных!" << endl; getch();
-         ofstream f("data.db");
-         f.close();
+         cout << "Не найден файл данных и индексаж!" << endl; getch();
+         ofstream data_file("data.db");
+         ofstream index_file("index.db");
+         index_file.close();
+         data_file.close();
          exit(1);
      }
-     f.close(); // закрываем файл
+     index_file.close(); // закрываем файлы
+     data_file.close();
 }
 
 void DataTable::show() {
@@ -163,17 +173,12 @@ void DataTable::clear_table() {
 
 void DataTable::save() {
      int len = this->table_length;
-     main_table row;
-     ofstream f;
-     f.open("data.db", ios::binary|ios::out);
-     for(int i=1; i<(len+1); i++) {
-        row.id = i;
-        row.title = this->data[i].title;
-        row.place = this->data[i].place;
-        row.year  = this->data[i].year;     
-        f.write((char *) &row, sizeof(row));
-     }
-     f.close();     
+     ofstream output_file("data.db", ios::binary);
+     ofstream  index_file("index.db", ios::binary);
+     output_file.write((char*)&(this->data), sizeof(this->data));
+     index_file.write((char*)&(len), sizeof(len));     
+     output_file.close();
+     index_file.close();
 }
 
 void DataTable::add_line(string title, string place, int year) {

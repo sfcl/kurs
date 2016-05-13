@@ -23,6 +23,13 @@ void gotoxy(int x, int y) {
      SetConsoleCursorPosition(hStdout, position);
 }
 
+char* RUS(const char*text) {
+    //функция поддержки русского языка
+    char * bufRus;
+    CharToOem(text,bufRus);
+    return bufRus;
+}
+
 bool is_empty(std::ifstream& pFile) {
      /* функция проверяльщик пустоты файла */
     return pFile.peek() == std::ifstream::traits_type::eof();
@@ -67,8 +74,12 @@ DataTable::DataTable() {
      ifstream index_file("index.db", ios::binary);
      unsigned int t_size; 
      if (data_file && index_file) {
-        index_file.read((char*)&t_size, sizeof(t_size));
-        main_table main_table[t_size];
+        if (is_empty(index_file)) {
+            t_size = 0;                          
+        } else {
+            index_file.read((char*)&t_size, sizeof(t_size));
+        }
+        main_table main_table[1000];
         data_file.read((char*)&main_table, sizeof(main_table));
         for (int idx = 0; idx < t_size; idx++) {
             this->add_line(main_table[idx].title, 
@@ -183,11 +194,11 @@ void DataTable::save() {
 
 void DataTable::add_line(string title, string place, int year) {
     this->table_length++;
-    int len = this->table_length;
-    this->data[len].id    = this->id;
-    this->data[len].title = title;
-    this->data[len].place = place;
-    this->data[len].year  = year;
+    int inx = this->table_length - 1;
+    this->data[inx].id    = this->id;
+    this->data[inx].title = title;
+    this->data[inx].place = place;
+    this->data[inx].year  = year;
     this->id++;     
 };
 
@@ -266,22 +277,12 @@ Dialog::Dialog() {
     /* empty contructor */ 
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     setlocale(LC_ALL, "Russian");
+/*    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251); */
     char c;
     DataTable t1;
-/*    t1.add_line("dfdf", "23213", 1998);
-    t1.add_line("dsdsd", "sdsd13", 1999);
-    t1.add_line("dsdsd", "sdsd13", 1999);
-    t1.add_line("dsdsd", "sdsd13", 1999);
-    t1.add_line("dsdsd", "sdsd13", 1999);
-    t1.add_line("dsdsd", "sdsd13", 1999);
-    t1.add_line("dsdsd", "sdsd13", 1999);
-    t1.add_line("dsdsd", "sdsd13", 1999);
-    t1.add_line("aaaaaaa", "aaaaaaaa", 2000);
-    t1.add_line("bbbbbbb", "vvvvvvvv", 2001);
-    t1.add_line("ccccccc", "wwwwwwww", 2001); */
     t1.show();
     int up = 0;
     unsigned int ch;

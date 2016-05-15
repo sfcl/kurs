@@ -5,6 +5,7 @@
 #include <conio.h>
 #include <windows.h>
 #include <fstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -12,8 +13,8 @@ const int TABLE_ROWS = 8;
 
 struct main_table {
     unsigned int id;
-    string title;
-    string place;
+    char title[30];
+    char place[29];
     int year;
 };
 
@@ -57,7 +58,7 @@ class DataTable {
         void show();
         void save();
         void clear_table();
-        void add_line(string title, string place, int year);
+        void add_line(char title[30], char place[29], int year);
         void data_up();
         void data_down();
 };
@@ -193,12 +194,12 @@ void DataTable::save() {
      index_file.close();
 }
 
-void DataTable::add_line(string title, string place, int year) {
+void DataTable::add_line(char title[30], char place[29], int year) {
     this->table_length++;
     int inx = this->table_length - 1;
     this->data[inx].id    = this->id;
-    this->data[inx].title = title;
-    this->data[inx].place = place;
+	strcpy(this->data[inx].title, title);
+	strcpy(this->data[inx].place, place); 
     this->data[inx].year  = year;
     this->id++;     
 };
@@ -222,14 +223,14 @@ class Dialog {
 void Dialog::show() {
     clear_all();
     char ch;
-    string title1 = "";
-    string place1 = "";
+    char title1[30] = "";
+    char place1[29] = "";
     int year1;
     cout << "Добавление памятника архитектуры Санкт-Петербурга" << endl << endl;
     cin.clear();cin.sync();
-    cout << "Название         -> "; getline(cin, title1);
-    cout << "мето             -> "; getline(cin, place1);
-    cout << "Год создания     -> "; cin >> year1;
+	cout << "Название         -> "; cin.getline(title1, sizeof(title1));cin.clear();cin.sync(); 
+	cout << "Мето             -> "; cin.getline(place1, sizeof(place1));cin.clear();cin.sync();
+	cout << "Год создания     -> "; cin >> setw(4) >> year1; cin.clear(); cin.sync();
     cout << "Сохранить? [y/n] -> "; ch = getch();
     if ((ch == 'y') || (ch == 'Y')) {
         /* Сохраняем данные в таблицу */ 
